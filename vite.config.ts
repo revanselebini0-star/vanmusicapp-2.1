@@ -1,20 +1,8 @@
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig } from 'vite'
+import react from '@vitejs/react-swc'
 
-export default defineConfig(() => {
-  return {
-    base: '/vanzmusicapp/',
-    plugins: [react(), tailwindcss()],
-    resolve: {
-      alias: {
-        "@": path.resolve(__dirname, "./src"),
-      },
-    },
-    server: {
-      hmr: process.env.DISABLE_HMR === 'true',
-      watch: process.env.DISABLE_HMR === 'true' ? null : {},
-    },
-  };
-});
+// https://vitejs.dev
+export default defineConfig({
+  plugins: [react()],
+  base: '/vanvanmusicapp-2.1/', 
+})
