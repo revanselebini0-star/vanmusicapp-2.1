@@ -1,0 +1,6 @@
+{
+  "name": "Vanz Music",
+  "description": "Aplikasi pemutar musik Vanz Music dengan katalog trending, pratinjau foto sampul full screen, lirik lagu asli sinkron, dan playlist lokal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
