@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/react-swc'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/vanmusicapp-2.1/', // Tambahkan baris ini!
-})
+  base: '/vanmusicapp-2.1/',
+});
