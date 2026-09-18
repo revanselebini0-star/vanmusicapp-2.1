@@ -53,7 +53,7 @@ export const SongCard: React.FC<SongCardProps> = ({
           <button
             id={`play-card-btn-${song.id}`}
             onClick={() => onPlay(song)}
-            className="w-12 h-12 rounded-full bg-[#fa243c] hover:bg-[#e01e35] text-white shadow-xl shadow-red-600/40 flex items-center justify-center transform hover:scale-110 active:scale-95 transition"
+            className="w-12 h-12 rounded-full bg-accent hover:bg-accent-light text-white shadow-xl shadow-accent flex items-center justify-center transform hover:scale-110 active:scale-95 transition"
             title={isCurrentSong && isPlaying ? 'Jeda' : 'Putar'}
           >
             {isCurrentSong && isPlaying ? (
@@ -69,7 +69,7 @@ export const SongCard: React.FC<SongCardProps> = ({
       <div className="flex-1 min-w-0">
         <h4
           className={`text-sm font-semibold truncate transition cursor-pointer ${
-            isCurrentSong ? 'text-[#fa243c]' : 'text-white group-hover:text-white'
+            isCurrentSong ? 'text-accent' : 'text-white group-hover:text-white'
           }`}
           onClick={() => onPlay(song)}
           title={song.title}
@@ -89,12 +89,12 @@ export const SongCard: React.FC<SongCardProps> = ({
               onToggleFavorite?.(song);
             }}
             className={`p-1.5 sm:p-1 rounded-full hover:bg-white/10 active:scale-90 transition ${
-              isFav ? 'text-[#fa243c]' : 'text-white/50 hover:text-white'
+              isFav ? 'text-accent' : 'text-white/50 hover:text-white'
             }`}
             title={isFav ? 'Disukai' : 'Suka'}
             aria-label="Favorit"
           >
-            <Heart className="w-3.5 h-3.5" fill={isFav ? '#fa243c' : 'none'} />
+            <Heart className="w-3.5 h-3.5" fill={isFav ? 'var(--accent-color)' : 'none'} />
           </button>
           <button
             onClick={(e) => {
@@ -150,19 +150,19 @@ export const SongRow: React.FC<SongRowProps> = ({
         {isCurrentSong ? (
           <div className="flex items-end gap-0.5 h-4">
             <span
-              className={`w-1 bg-[#fa243c] rounded-full ${
+              className={`w-1 bg-accent rounded-full ${
                 isPlaying ? 'animate-bounce' : 'h-3'
               }`}
               style={{ height: isPlaying ? '100%' : '50%', animationDelay: '0ms' }}
             />
             <span
-              className={`w-1 bg-[#fa243c] rounded-full ${
+              className={`w-1 bg-accent rounded-full ${
                 isPlaying ? 'animate-bounce' : 'h-2'
               }`}
               style={{ height: isPlaying ? '70%' : '30%', animationDelay: '150ms' }}
             />
             <span
-              className={`w-1 bg-[#fa243c] rounded-full ${
+              className={`w-1 bg-accent rounded-full ${
                 isPlaying ? 'animate-bounce' : 'h-4'
               }`}
               style={{ height: isPlaying ? '90%' : '60%', animationDelay: '300ms' }}
@@ -202,7 +202,7 @@ export const SongRow: React.FC<SongRowProps> = ({
       <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onPlay(song)}>
         <h4
           className={`text-sm font-semibold truncate transition ${
-            isCurrentSong ? 'text-[#fa243c]' : 'text-white'
+            isCurrentSong ? 'text-accent' : 'text-white'
           }`}
         >
           {song.title}
@@ -230,12 +230,12 @@ export const SongRow: React.FC<SongRowProps> = ({
             onToggleFavorite?.(song);
           }}
           className={`p-2 sm:p-1.5 rounded-full hover:bg-white/10 active:scale-90 transition ${
-            isFav ? 'text-[#fa243c]' : 'text-white/50 hover:text-white'
+            isFav ? 'text-accent' : 'text-white/50 hover:text-white'
           }`}
           title={isFav ? 'Disukai' : 'Suka'}
           aria-label="Favorit"
         >
-          <Heart className="w-4 h-4" fill={isFav ? '#fa243c' : 'none'} />
+          <Heart className="w-4 h-4" fill={isFav ? 'var(--accent-color)' : 'none'} />
         </button>
 
         <button

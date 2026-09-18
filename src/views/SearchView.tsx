@@ -55,7 +55,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
     <div className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 max-w-7xl mx-auto">
       {/* Search Header */}
       <div>
-        <span className="text-xs font-bold uppercase tracking-widest text-[#fa243c]">
+        <span className="text-xs font-bold uppercase tracking-widest text-accent">
           Pencarian Cepat
         </span>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-0.5">
@@ -75,11 +75,11 @@ export const SearchView: React.FC<SearchViewProps> = ({
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Ketik judul lagu, penyanyi, atau penggalan lirik..."
-          className="w-full pl-11 sm:pl-12 pr-11 sm:pr-12 py-3 sm:py-3.5 rounded-2xl bg-white/7 border border-white/10 focus:border-[#fa243c] focus:bg-white/10 focus:outline-none text-white placeholder:text-white/40 text-sm sm:text-base shadow-lg transition"
+          className="w-full pl-11 sm:pl-12 pr-11 sm:pr-12 py-3 sm:py-3.5 rounded-2xl bg-white/7 border border-white/10 focus:border-accent focus:bg-white/10 focus:outline-none text-white placeholder:text-white/40 text-sm sm:text-base shadow-lg transition"
           autoFocus
         />
         {isSearching ? (
-          <Loader2 className="w-5 h-5 text-[#fa243c] absolute right-4 top-1/2 -translate-y-1/2 animate-spin" />
+          <Loader2 className="w-5 h-5 text-accent absolute right-4 top-1/2 -translate-y-1/2 animate-spin" />
         ) : (
           searchQuery && (
             <button
@@ -105,7 +105,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
               onClick={() => onSearchChange(tag)}
               className={`px-3.5 py-1.5 rounded-xl text-xs font-medium border transition ${
                 searchQuery.toLowerCase() === tag.toLowerCase()
-                  ? 'bg-[#fa243c] text-white border-[#fa243c]'
+                  ? 'bg-accent text-white border-accent'
                   : 'bg-white/5 hover:bg-white/10 border-white/5 text-white/80 hover:text-white'
               }`}
             >
@@ -170,7 +170,7 @@ export const SearchView: React.FC<SearchViewProps> = ({
           </div>
         ) : searchQuery.trim() === '' ? (
           <div className="text-center py-16 space-y-3 text-white/40">
-            <Music className="w-12 h-12 mx-auto opacity-30 text-[#fa243c]" />
+            <Music className="w-12 h-12 mx-auto opacity-30 text-accent" />
             <h3 className="text-base font-semibold text-white/70">Mulai Mengetik Lagu Favorit Anda</h3>
             <p className="text-xs max-w-sm mx-auto">
               Ketik nama lagu atau artis pada kolom di atas, atau pilih salah satu kata kunci populer.

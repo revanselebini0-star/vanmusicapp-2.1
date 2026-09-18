@@ -1,11 +1,54 @@
 @import "tailwindcss";
 
+:root {
+  --accent-color: #1ed760;
+  --accent-rgb: 30, 215, 96;
+  --accent-light: #1fdf64;
+  --accent-dark: #169c46;
+  --accent-glow: rgba(30, 215, 96, 0.35);
+  transition: --accent-color 0.5s ease;
+}
+
 @layer base {
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Circular", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color-scheme: dark;
     background-color: #000000;
   }
+}
+
+.text-accent {
+  color: var(--accent-color, #1ed760);
+}
+.bg-accent {
+  background-color: var(--accent-color, #1ed760);
+}
+.border-accent {
+  border-color: var(--accent-color, #1ed760);
+}
+.bg-accent-soft {
+  background-color: rgba(var(--accent-rgb, 30, 215, 96), 0.18);
+}
+.border-accent-soft {
+  border-color: rgba(var(--accent-rgb, 30, 215, 96), 0.3);
+}
+.fill-accent {
+  fill: var(--accent-color, #1ed760);
+}
+.hover\:bg-accent:hover {
+  background-color: var(--accent-color, #1ed760);
+}
+.hover\:bg-accent-light:hover {
+  background-color: var(--accent-light, #1fdf64);
+}
+.hover\:text-accent:hover {
+  color: var(--accent-color, #1ed760);
+}
+.accent-range {
+  accent-color: var(--accent-color, #1ed760);
+}
+.shadow-accent {
+  box-shadow: 0 10px 25px -5px rgba(var(--accent-rgb, 30, 215, 96), 0.4);
 }
 
 /* Custom Spotify-inspired dark scrollbar */

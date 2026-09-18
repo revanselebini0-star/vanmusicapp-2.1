@@ -47,11 +47,11 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#fa243c]">
+          <span className="text-xs font-bold uppercase tracking-widest text-accent">
             Katalog Global
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-0.5 flex items-center gap-2.5">
-            <Compass className="w-6 h-6 sm:w-7 sm:h-7 text-[#fa243c]" />
+            <Compass className="w-6 h-6 sm:w-7 sm:h-7 text-accent" />
             Telusuri Tangga Musik
           </h2>
           <p className="text-xs text-white/50 mt-1">
@@ -69,7 +69,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
                 onClick={() => onRegionChange(r.code)}
                 className={`px-2.5 sm:px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
                   selectedRegion === r.code
-                    ? 'bg-[#fa243c] text-white shadow'
+                    ? 'bg-accent text-white shadow'
                     : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -127,7 +127,7 @@ export const BrowseView: React.FC<BrowseViewProps> = ({
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-            <Flame className="w-4 h-4 text-[#fa243c]" />
+            <Flame className="w-4 h-4 text-accent" />
             Daftar Video Musik Terpopuler ({trendingSongs.length})
           </h3>
         </div>

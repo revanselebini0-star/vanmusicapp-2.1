@@ -89,7 +89,7 @@ export const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="cth. Favorit Akhir Pekan, Workout, Coding Beats"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-[#fa243c] focus:outline-none text-white placeholder:text-white/30 text-sm transition"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-accent focus:outline-none text-white placeholder:text-white/30 text-sm transition"
               autoFocus
               required
             />
@@ -105,7 +105,7 @@ export const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Tuliskan catatan singkat tentang playlist ini..."
               rows={2}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-[#fa243c] focus:outline-none text-white placeholder:text-white/30 text-sm resize-none transition"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-accent focus:outline-none text-white placeholder:text-white/30 text-sm resize-none transition"
             />
           </div>
 
@@ -122,7 +122,7 @@ export const CreatePlaylistModal: React.FC<CreatePlaylistModalProps> = ({
               type="submit"
               id="save-playlist-submit-btn"
               disabled={!title.trim()}
-              className="px-5 py-2.5 rounded-xl bg-[#fa243c] hover:bg-[#e01e35] disabled:opacity-50 disabled:hover:bg-[#fa243c] text-white text-sm font-semibold shadow-lg shadow-red-600/30 transition flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-light disabled:opacity-50 disabled:hover:bg-accent text-white text-sm font-semibold shadow-lg shadow-accent transition flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
               Buat Playlist
@@ -192,7 +192,7 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
         </p>
 
         {notification && (
-          <div className="mb-3 px-3 py-1.5 rounded-lg bg-[#fa243c]/20 border border-[#fa243c]/40 text-xs text-rose-300 font-medium animate-fadeIn">
+          <div className="mb-3 px-3 py-1.5 rounded-lg bg-accent-soft border border-accent-soft text-xs text-accent font-medium animate-fadeIn">
             {notification}
           </div>
         )}
@@ -224,7 +224,7 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center border text-xs font-bold ${
                     hasSong
-                      ? 'bg-[#fa243c] border-[#fa243c] text-white'
+                      ? 'bg-accent border-accent text-white'
                       : 'border-white/30 text-transparent'
                   }`}
                 >
@@ -242,7 +242,7 @@ export const AddToPlaylistModal: React.FC<AddToPlaylistModalProps> = ({
               onClose();
               onRequestCreatePlaylist();
             }}
-            className="text-xs font-semibold text-[#fa243c] hover:underline flex items-center gap-1"
+            className="text-xs font-semibold text-accent hover:underline flex items-center gap-1"
           >
             <Plus className="w-3.5 h-3.5" />
             Buat Playlist Baru

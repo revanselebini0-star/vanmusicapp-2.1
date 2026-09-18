@@ -30,7 +30,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-4 border-b border-white/5">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-[#fa243c]">
+          <span className="text-xs font-bold uppercase tracking-widest text-accent">
             Riwayat Pemutaran
           </span>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mt-0.5 flex items-center gap-2.5">
@@ -64,7 +64,7 @@ export const HistoryView: React.FC<HistoryViewProps> = ({
             </p>
             <button
               onClick={onNavigateToBrowse}
-              className="mt-2 px-4 py-2 rounded-xl bg-[#fa243c] text-white text-xs font-semibold hover:bg-[#e01e35] transition inline-flex items-center gap-1.5"
+              className="mt-2 px-4 py-2 rounded-xl bg-accent text-white text-xs font-semibold hover:bg-accent-light transition inline-flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
               Putar Musik Trending Sekarang

@@ -33,7 +33,7 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({
         {/* Drawer Header */}
         <div className="p-4 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ListMusic className="w-5 h-5 text-[#fa243c]" />
+            <ListMusic className="w-5 h-5 text-accent" />
             <h3 className="font-bold text-white text-base">Berikutnya (Up Next)</h3>
           </div>
           <div className="flex items-center gap-2">
@@ -58,7 +58,7 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({
       {/* Currently Playing Card */}
       {currentSong && (
         <div className="p-4 bg-white/5 border-b border-white/5">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#fa243c] block mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-accent block mb-2">
             Sedang Diputar
           </span>
           <div className="flex items-center gap-3">
@@ -105,7 +105,7 @@ export const QueueDrawer: React.FC<QueueDrawerProps> = ({
                 className="flex-1 min-w-0 cursor-pointer"
                 onClick={() => onPlaySong(song)}
               >
-                <h4 className="text-xs font-semibold text-white truncate group-hover:text-[#fa243c] transition">
+                <h4 className="text-xs font-semibold text-white truncate group-hover:text-accent transition">
                   {song.title}
                 </h4>
                 <p className="text-[11px] text-white/50 truncate">{song.artist}</p>

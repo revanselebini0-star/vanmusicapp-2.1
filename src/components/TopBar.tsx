@@ -1,6 +1,15 @@
 import React, { useRef } from 'react';
-import { Search, X, Globe, Sparkles, Menu, Music2 } from 'lucide-react';
-import { ViewTab } from '../types';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  X,
+  Settings,
+  Menu,
+  CheckCircle2,
+  Globe,
+} from 'lucide-react';
+import { UserProfile, ViewTab } from '../types';
 
 interface TopBarProps {
   searchQuery: string;
@@ -10,14 +19,18 @@ interface TopBarProps {
   currentTab: ViewTab;
   onOpenSearchTab: () => void;
   onToggleMobileMenu?: () => void;
+  user?: UserProfile | null;
+  onOpenAuthModal?: () => void;
+  onNavigateBack?: () => void;
+  onNavigateForward?: () => void;
 }
 
 export const REGIONS = [
-  { code: 'ID', name: 'Indonesia', flag: '🇮🇩' },
-  { code: 'US', name: 'Global/US', flag: '🇺🇸' },
-  { code: 'KR', name: 'Korea', flag: '🇰🇷' },
-  { code: 'JP', name: 'Jepang', flag: '🇯🇵' },
-  { code: 'GB', name: 'UK', flag: '🇬🇧' },
+  { code: 'ID', name: 'ID', flag: '🇮🇩' },
+  { code: 'US', name: 'US', flag: '🇺🇸' },
+  { code: 'KR', name: 'KR', flag: '🇰🇷' },
+  { code: 'JP', name: 'JP', flag: '🇯🇵' },
+  { code: 'GB', name: 'GB', flag: '🇬🇧' },
 ];
 
 export const TopBar: React.FC<TopBarProps> = ({
@@ -28,6 +41,10 @@ export const TopBar: React.FC<TopBarProps> = ({
   currentTab,
   onOpenSearchTab,
   onToggleMobileMenu,
+  user = null,
+  onOpenAuthModal,
+  onNavigateBack,
+  onNavigateForward,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -46,48 +63,66 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header
-      id="apple-music-topbar"
-      className="h-16 px-3 sm:px-6 flex items-center justify-between gap-2 sm:gap-4 bg-[#121216]/90 backdrop-blur-xl border-b border-white/5 sticky top-0 z-20 shrink-0"
+      id="tidal-topbar"
+      className="hidden md:flex h-16 px-4 sm:px-8 items-center justify-between gap-4 bg-[#000000] border-b border-white/5 sticky top-0 z-20 shrink-0 select-none"
     >
-      {/* Mobile Drawer Hamburger & Brand Icon (< md) */}
-      <div className="flex items-center gap-2 md:hidden">
+      {/* Left: Mobile menu button or History Navigation Arrows (< >) */}
+      <div className="flex items-center gap-2">
+        {/* Mobile Hamburger */}
         <button
-          id="mobile-hamburger-btn"
           onClick={onToggleMobileMenu}
-          className="p-2 -ml-1 rounded-xl text-white/70 hover:text-white hover:bg-white/10 active:scale-95 transition"
-          aria-label="Buka Menu Navigasi"
-          title="Buka Menu Navigasi"
+          className="md:hidden p-2 rounded-full hover:bg-white/10 text-white/70 active:scale-95 transition"
+          aria-label="Menu"
         >
           <Menu className="w-5 h-5" />
         </button>
 
-        <div
-          className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#fa243c] to-[#ff4762] flex items-center justify-center shadow-md shadow-[#fa243c]/30 cursor-pointer"
-          onClick={onToggleMobileMenu}
-        >
-          <Music2 className="w-4 h-4 text-white" />
+        {/* Desktop History Arrows: < and > */}
+        <div className="hidden sm:flex items-center gap-2">
+          <button
+            onClick={() => {
+              if (onNavigateBack) onNavigateBack();
+              else window.history.back();
+            }}
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 text-white/70 hover:text-white flex items-center justify-center transition border border-white/5"
+            title="Kembali"
+            aria-label="Kembali"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => {
+              if (onNavigateForward) onNavigateForward();
+              else window.history.forward();
+            }}
+            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 active:scale-95 text-white/70 hover:text-white flex items-center justify-center transition border border-white/5"
+            title="Maju"
+            aria-label="Maju"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
-      {/* Real-time Search Input Box */}
-      <div className="flex-1 max-w-md relative min-w-0">
-        <div className="relative flex items-center">
-          <Search className="w-4 h-4 text-white/40 absolute left-3 pointer-events-none" />
+      {/* Right Controls: Search pill + Settings / Profile */}
+      <div className="flex items-center gap-3">
+        {/* Tidal Search Pill */}
+        <div className="relative flex items-center w-48 sm:w-64 md:w-80">
+          <Search className="w-4 h-4 text-white/40 absolute left-3.5 pointer-events-none" />
           <input
             ref={inputRef}
             type="text"
-            id="global-search-input"
+            id="tidal-search-input"
             value={searchQuery}
             onChange={handleInputChange}
             onFocus={() => {
               if (currentTab !== 'search' && searchQuery) onOpenSearchTab();
             }}
-            placeholder="Cari lagu, artis, lirik..."
-            className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/7 border border-white/10 focus:border-[#fa243c] focus:bg-white/10 focus:outline-none text-xs sm:text-sm text-white placeholder:text-white/40 transition duration-200"
+            placeholder="Search"
+            className="w-full pl-10 pr-8 py-1.5 rounded-full bg-[#18181d] border border-white/10 hover:border-white/20 focus:border-cyan-400 focus:bg-[#202026] focus:outline-none text-xs sm:text-sm text-white placeholder:text-white/40 transition duration-200"
           />
           {searchQuery && (
             <button
-              id="clear-search-btn"
               onClick={handleClear}
               className="absolute right-2.5 p-1 text-white/40 hover:text-white rounded-full transition"
             >
@@ -95,35 +130,54 @@ export const TopBar: React.FC<TopBarProps> = ({
             </button>
           )}
         </div>
-      </div>
 
-      {/* Right controls: Region selector and Apple-style pill indicator */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        {/* Region selector for trending */}
-        <div className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs font-medium text-white/80">
-          <Globe className="w-3.5 h-3.5 text-white/50 shrink-0" />
-          <span className="text-white/40 text-[11px] uppercase tracking-wider hidden lg:inline">
-            Trending:
-          </span>
+        {/* Region selector (compact) */}
+        <div className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-white/70">
+          <Globe className="w-3 h-3 text-white/40" />
           <select
-            id="region-select"
             value={selectedRegion}
             onChange={(e) => onRegionChange(e.target.value)}
             className="bg-transparent text-white text-xs font-semibold focus:outline-none cursor-pointer"
           >
             {REGIONS.map((r) => (
-              <option key={r.code} value={r.code} className="bg-[#1c1c22] text-white">
+              <option key={r.code} value={r.code} className="bg-[#18181d] text-white">
                 {r.flag} {r.name}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Hi-Res Lossless Apple badge (Desktop large screens) */}
-        <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-[#fa243c]/20 text-[11px] font-semibold text-[#fa243c]">
-          <Sparkles className="w-3 h-3" />
-          <span>Lossless Audio</span>
-        </div>
+        {/* Settings / Google Profile Button (Circle in top-right) */}
+        {user ? (
+          <button
+            onClick={onOpenAuthModal}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition border border-white/10 active:scale-95 group relative"
+            title={`Akun: ${user.name}`}
+          >
+            {user.picture ? (
+              <img
+                src={user.picture}
+                alt={user.name}
+                referrerPolicy="no-referrer"
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <span className="text-xs font-bold text-white">
+                {user.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-cyan-400 border border-black" />
+          </button>
+        ) : (
+          <button
+            onClick={onOpenAuthModal}
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition border border-white/10 active:scale-95"
+            title="Pengaturan & Masuk Akun"
+            aria-label="Pengaturan"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </header>
   );

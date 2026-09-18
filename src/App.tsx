@@ -7,20 +7,55 @@ import { QueueDrawer } from './components/QueueDrawer';
 import { VideoModal } from './components/VideoModal';
 import { CreatePlaylistModal, AddToPlaylistModal } from './components/PlaylistModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
+import { GoogleAuthModal } from './components/GoogleAuthModal';
 import { ListenNowView } from './views/ListenNowView';
 import { BrowseView } from './views/BrowseView';
 import { SearchView } from './views/SearchView';
 import { PlaylistDetailView } from './views/PlaylistDetailView';
 import { FavoritesView } from './views/FavoritesView';
 import { HistoryView } from './views/HistoryView';
-import { ViewTab, Song, Playlist, PlayerState, RepeatMode } from './types';
+import { VideosView } from './views/VideosView';
+import { RadioView } from './views/RadioView';
+import { AlbumsView } from './views/AlbumsView';
+import { ArtistsView } from './views/ArtistsView';
+import { AppleMusicMobileView } from './components/AppleMusicMobileView';
+import { ViewTab, Song, Playlist, PlayerState, RepeatMode, UserProfile } from './types';
 import { db } from './services/db';
+import { authService } from './services/auth';
 import { fetchTrendingMusic, searchYouTubeMusic } from './services/youtube';
+import { extractThemeFromImage, applyThemeToCss } from './services/colorExtractor';
 
 export default function App() {
-  // Navigation & View State
-  const [currentTab, setCurrentTab] = useState<ViewTab>('listen-now');
+  // Navigation & View State (Tidal Home is default)
+  const [currentTab, setCurrentTab] = useState<ViewTab>('home');
   const [selectedPlaylistId, setSelectedPlaylistId] = useState<string | null>(null);
+  const [historyStack, setHistoryStack] = useState<ViewTab[]>(['home']);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
+
+  const navigateToTab = (tab: ViewTab) => {
+    setSelectedPlaylistId(null);
+    setCurrentTab(tab);
+    setHistoryStack((prev) => [...prev.slice(0, historyIndex + 1), tab]);
+    setHistoryIndex((prev) => prev + 1);
+  };
+
+  const handleNavigateBack = () => {
+    if (historyIndex > 0) {
+      const prevIdx = historyIndex - 1;
+      setHistoryIndex(prevIdx);
+      setCurrentTab(historyStack[prevIdx]);
+      setSelectedPlaylistId(null);
+    }
+  };
+
+  const handleNavigateForward = () => {
+    if (historyIndex < historyStack.length - 1) {
+      const nextIdx = historyIndex + 1;
+      setHistoryIndex(nextIdx);
+      setCurrentTab(historyStack[nextIdx]);
+      setSelectedPlaylistId(null);
+    }
+  };
 
   // Region & Trending state
   const [selectedRegion, setSelectedRegion] = useState<string>('ID');
@@ -58,12 +93,22 @@ export default function App() {
   const [isQueueOpen, setIsQueueOpen] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(() => authService.getUser());
   const [toast, setToast] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
   };
+
+  // Subscribe to auth changes
+  useEffect(() => {
+    const unsub = authService.subscribe((updatedUser) => {
+      setUser(updatedUser);
+    });
+    return unsub;
+  }, []);
 
   // 1. Fetch Trending Music on mount and when region changes
   useEffect(() => {
@@ -124,6 +169,26 @@ export default function App() {
       clearTimeout(handler);
     };
   }, [searchQuery]);
+
+  // 3. Dynamic Theme Accent color based on current song artwork
+  useEffect(() => {
+    if (!playerState.currentSong) return;
+    const song = playerState.currentSong;
+    let isCurrent = true;
+
+    extractThemeFromImage(
+      song.thumbnailUrl,
+      `${song.title} ${song.artist}`
+    ).then((theme) => {
+      if (isCurrent) {
+        applyThemeToCss(theme);
+      }
+    });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [playerState.currentSong?.id, playerState.currentSong?.thumbnailUrl]);
 
   // Refresh playlists and favorites from DB
   const refreshDbData = useCallback(() => {
@@ -308,15 +373,12 @@ export default function App() {
         onError={(err) => showToast(err)}
       />
 
-      {/* Main Container: Split Panels in modern Spotify desktop style */}
-      <div className="flex flex-1 min-h-0 overflow-hidden md:p-2 md:gap-2">
+      {/* Main Container: Seamless Dark Tidal Layout */}
+      <div className="flex flex-1 min-h-0 overflow-hidden bg-[#000000]">
         {/* Left Sidebar (Desktop + Mobile Slide-over Drawer) */}
         <Sidebar
           currentTab={currentTab}
-          onSelectTab={(tab) => {
-            setSelectedPlaylistId(null);
-            setCurrentTab(tab);
-          }}
+          onSelectTab={navigateToTab}
           playlists={playlists}
           selectedPlaylistId={selectedPlaylistId}
           onSelectPlaylist={handleSelectPlaylist}
@@ -324,11 +386,13 @@ export default function App() {
           onPlaylistDataChanged={refreshDbData}
           isMobileOpen={isMobileMenuOpen}
           onCloseMobile={() => setIsMobileMenuOpen(false)}
+          user={user}
+          onOpenAuthModal={() => setIsAuthModalOpen(true)}
         />
 
         {/* Main Content Area Panel */}
-        <div className="flex-1 flex flex-col h-full overflow-hidden relative md:rounded-lg bg-[#121212]">
-          {/* Top Bar with real-time search & mobile menu toggle */}
+        <div className="flex-1 flex flex-col h-full overflow-hidden relative bg-[#08080c]">
+          {/* Top Bar with real-time search & history navigation */}
           <TopBar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -337,114 +401,205 @@ export default function App() {
             currentTab={currentTab}
             onOpenSearchTab={() => {
               setSelectedPlaylistId(null);
-              setCurrentTab('search');
+              navigateToTab('search');
             }}
             onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            user={user}
+            onOpenAuthModal={() => setIsAuthModalOpen(true)}
+            onNavigateBack={handleNavigateBack}
+            onNavigateForward={handleNavigateForward}
           />
 
           {/* Dynamic View Panel */}
           <main className="flex-1 overflow-y-auto overflow-x-hidden pb-44 md:pb-6 select-text">
-            {currentTab === 'listen-now' && !selectedPlaylistId && (
-            <ListenNowView
-              trendingSongs={trendingSongs}
-              isLoading={isLoadingTrending}
-              currentSong={playerState.currentSong}
-              isPlaying={playerState.isPlaying}
-              onPlaySong={handlePlaySong}
-              onOpenAddToPlaylist={setSongToAddToPlaylist}
-              onToggleFavorite={handleToggleFavorite}
-              onNavigateToBrowse={() => setCurrentTab('browse')}
-              playlists={playlists}
-              onSelectPlaylist={handleSelectPlaylist}
-            />
-          )}
+            {(currentTab === 'home' || currentTab === 'listen-now') && !selectedPlaylistId && (
+              <>
+                <div className="hidden md:block">
+                  <ListenNowView
+                    trendingSongs={trendingSongs}
+                    isLoading={isLoadingTrending}
+                    currentSong={playerState.currentSong}
+                    isPlaying={playerState.isPlaying}
+                    onPlaySong={handlePlaySong}
+                    onOpenAddToPlaylist={setSongToAddToPlaylist}
+                    onToggleFavorite={handleToggleFavorite}
+                    onNavigateToBrowse={() => navigateToTab('explore')}
+                    playlists={playlists}
+                    onSelectPlaylist={handleSelectPlaylist}
+                    onSelectGenre={handleSelectGenre}
+                  />
+                </div>
+                <div className="md:hidden">
+                  <AppleMusicMobileView
+                    currentSong={playerState.currentSong}
+                    isPlaying={playerState.isPlaying}
+                    onPlaySong={handlePlaySong}
+                    onOpenAddToPlaylist={setSongToAddToPlaylist}
+                    user={user}
+                    onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                    activeTabTitle="Beranda"
+                    trendingSongs={trendingSongs}
+                    isLoadingTrending={isLoadingTrending}
+                    selectedRegion={selectedRegion}
+                    onRegionChange={setSelectedRegion}
+                    history={history}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                </div>
+              </>
+            )}
 
-          {currentTab === 'browse' && !selectedPlaylistId && (
-            <BrowseView
-              trendingSongs={trendingSongs}
-              isLoading={isLoadingTrending}
-              selectedRegion={selectedRegion}
-              onRegionChange={setSelectedRegion}
-              currentSong={playerState.currentSong}
-              isPlaying={playerState.isPlaying}
-              onPlaySong={handlePlaySong}
-              onOpenAddToPlaylist={setSongToAddToPlaylist}
-              onToggleFavorite={handleToggleFavorite}
-              onSelectGenre={handleSelectGenre}
-            />
-          )}
+            {(currentTab === 'explore' || currentTab === 'browse') && !selectedPlaylistId && (
+              <>
+                <div className="hidden md:block">
+                  <BrowseView
+                    trendingSongs={trendingSongs}
+                    isLoading={isLoadingTrending}
+                    selectedRegion={selectedRegion}
+                    onRegionChange={setSelectedRegion}
+                    currentSong={playerState.currentSong}
+                    isPlaying={playerState.isPlaying}
+                    onPlaySong={handlePlaySong}
+                    onOpenAddToPlaylist={setSongToAddToPlaylist}
+                    onToggleFavorite={handleToggleFavorite}
+                    onSelectGenre={handleSelectGenre}
+                  />
+                </div>
+                <div className="md:hidden">
+                  <AppleMusicMobileView
+                    currentSong={playerState.currentSong}
+                    isPlaying={playerState.isPlaying}
+                    onPlaySong={handlePlaySong}
+                    onOpenAddToPlaylist={setSongToAddToPlaylist}
+                    user={user}
+                    onOpenAuthModal={() => setIsAuthModalOpen(true)}
+                    activeTabTitle="Baru"
+                    trendingSongs={trendingSongs}
+                    isLoadingTrending={isLoadingTrending}
+                    selectedRegion={selectedRegion}
+                    onRegionChange={setSelectedRegion}
+                    history={history}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                </div>
+              </>
+            )}
 
-          {currentTab === 'search' && !selectedPlaylistId && (
-            <SearchView
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchResults={searchResults}
-              isSearching={isSearching}
-              currentSong={playerState.currentSong}
-              isPlaying={playerState.isPlaying}
-              onPlaySong={handlePlaySong}
-              onOpenAddToPlaylist={setSongToAddToPlaylist}
-              onToggleFavorite={handleToggleFavorite}
-            />
-          )}
+            {currentTab === 'videos' && !selectedPlaylistId && (
+              <VideosView
+                onPlaySong={handlePlaySong}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+              />
+            )}
 
-          {currentTab === 'favorites' && !selectedPlaylistId && (
-            <FavoritesView
-              favorites={favorites}
-              currentSong={playerState.currentSong}
-              isPlaying={playerState.isPlaying}
-              onPlaySong={handlePlaySong}
-              onPlayAll={handlePlayAll}
-              onOpenAddToPlaylist={setSongToAddToPlaylist}
-              onToggleFavorite={handleToggleFavorite}
-              onNavigateToBrowse={() => setCurrentTab('browse')}
-            />
-          )}
+            {currentTab === 'radio' && !selectedPlaylistId && (
+              <RadioView
+                onPlaySong={handlePlaySong}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+              />
+            )}
 
-          {currentTab === 'history' && !selectedPlaylistId && (
-            <HistoryView
-              history={history}
-              currentSong={playerState.currentSong}
-              isPlaying={playerState.isPlaying}
-              onPlaySong={handlePlaySong}
-              onOpenAddToPlaylist={setSongToAddToPlaylist}
-              onToggleFavorite={handleToggleFavorite}
-              onClearHistory={() => {
-                db.clearHistory();
-                refreshDbData();
-                showToast('Riwayat pemutaran dibersihkan');
-              }}
-              onNavigateToBrowse={() => setCurrentTab('browse')}
-            />
-          )}
+            {currentTab === 'albums' && !selectedPlaylistId && (
+              <AlbumsView
+                onPlaySong={handlePlaySong}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+              />
+            )}
 
-          {currentTab === 'playlist-detail' && activePlaylist && (
-            <PlaylistDetailView
-              playlist={activePlaylist}
-              currentSong={playerState.currentSong}
-              isPlaying={playerState.isPlaying}
-              onPlaySong={handlePlaySong}
-              onPlayAll={handlePlayAll}
-              onOpenAddToPlaylist={setSongToAddToPlaylist}
-              onToggleFavorite={handleToggleFavorite}
-              onPlaylistUpdated={refreshDbData}
-              onPlaylistDeleted={() => {
-                setSelectedPlaylistId(null);
-                setCurrentTab('listen-now');
-                refreshDbData();
-                showToast('Playlist berhasil dihapus');
-              }}
-              onNavigateToBrowse={() => setCurrentTab('browse')}
-            />
-          )}
-        </main>
+            {currentTab === 'artists' && !selectedPlaylistId && (
+              <ArtistsView
+                onPlaySong={handlePlaySong}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+              />
+            )}
+
+            {(currentTab === 'tracks' || currentTab === 'favorites') && !selectedPlaylistId && (
+              <FavoritesView
+                favorites={favorites}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+                onPlaySong={handlePlaySong}
+                onPlayAll={handlePlayAll}
+                onOpenAddToPlaylist={setSongToAddToPlaylist}
+                onToggleFavorite={handleToggleFavorite}
+                onNavigateToBrowse={() => navigateToTab('explore')}
+              />
+            )}
+
+            {currentTab === 'playlists' && !selectedPlaylistId && (
+              <FavoritesView
+                favorites={favorites}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+                onPlaySong={handlePlaySong}
+                onPlayAll={handlePlayAll}
+                onOpenAddToPlaylist={setSongToAddToPlaylist}
+                onToggleFavorite={handleToggleFavorite}
+                onNavigateToBrowse={() => navigateToTab('explore')}
+              />
+            )}
+
+            {currentTab === 'search' && !selectedPlaylistId && (
+              <SearchView
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                searchResults={searchResults}
+                isSearching={isSearching}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+                onPlaySong={handlePlaySong}
+                onOpenAddToPlaylist={setSongToAddToPlaylist}
+                onToggleFavorite={handleToggleFavorite}
+              />
+            )}
+
+            {currentTab === 'history' && !selectedPlaylistId && (
+              <HistoryView
+                history={history}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+                onPlaySong={handlePlaySong}
+                onOpenAddToPlaylist={setSongToAddToPlaylist}
+                onToggleFavorite={handleToggleFavorite}
+                onClearHistory={() => {
+                  db.clearHistory();
+                  refreshDbData();
+                  showToast('Riwayat pemutaran dibersihkan');
+                }}
+                onNavigateToBrowse={() => navigateToTab('explore')}
+              />
+            )}
+
+            {currentTab === 'playlist-detail' && activePlaylist && (
+              <PlaylistDetailView
+                playlist={activePlaylist}
+                currentSong={playerState.currentSong}
+                isPlaying={playerState.isPlaying}
+                onPlaySong={handlePlaySong}
+                onPlayAll={handlePlayAll}
+                onOpenAddToPlaylist={setSongToAddToPlaylist}
+                onToggleFavorite={handleToggleFavorite}
+                onPlaylistUpdated={refreshDbData}
+                onPlaylistDeleted={() => {
+                  setSelectedPlaylistId(null);
+                  navigateToTab('home');
+                  refreshDbData();
+                  showToast('Playlist berhasil dihapus');
+                }}
+                onNavigateToBrowse={() => navigateToTab('explore')}
+              />
+            )}
+          </main>
+        </div>
       </div>
-    </div>
 
-      {/* Full-width Spotify Bottom Player Bar */}
+      {/* Full-width Tidal Bottom Player Bar */}
       <Player
         playerState={playerState}
-        onPlaySong={handlePlaySong}
         onTogglePlay={handleTogglePlay}
         onNextTrack={handleNextTrack}
         onPrevTrack={handlePrevTrack}
@@ -457,7 +612,6 @@ export default function App() {
         onToggleQueue={() => setIsQueueOpen(!isQueueOpen)}
         isQueueOpen={isQueueOpen}
         onToggleVideoModal={() => setIsVideoModalOpen(!isVideoModalOpen)}
-        isVideoModalOpen={isVideoModalOpen}
       />
 
       {/* Up Next Queue Drawer */}
@@ -504,6 +658,8 @@ export default function App() {
         onToggleRepeat={handleToggleRepeat}
         onVolumeChange={handleVolumeChange}
         onToggleMute={handleToggleMute}
+        onToggleQueue={() => setIsQueueOpen((prev) => !prev)}
+        isQueueOpen={isQueueOpen}
       />
 
       {/* Create Playlist Modal */}
@@ -529,13 +685,20 @@ export default function App() {
       {/* Mobile Bottom Navigation Bar (md:hidden) */}
       <MobileBottomNav
         currentTab={currentTab}
-        onSelectTab={(tab) => {
-          setSelectedPlaylistId(null);
-          setCurrentTab(tab);
-          setIsMobileMenuOpen(false);
-        }}
+        onSelectTab={navigateToTab}
         onOpenLibraryMenu={() => setIsMobileMenuOpen(true)}
         favoriteCount={favorites.length}
+      />
+
+      {/* Google Authentication Modal */}
+      <GoogleAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        user={user}
+        onLoginSuccess={(loggedInUser) => {
+          setUser(loggedInUser);
+          showToast(`Berhasil login sebagai ${loggedInUser.name}`);
+        }}
       />
 
       {/* Notification Toast */}

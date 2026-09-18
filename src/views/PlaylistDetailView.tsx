@@ -83,7 +83,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
 
         {/* Playlist Meta Details */}
         <div className="flex-1 text-center md:text-left min-w-0 w-full">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#fa243c]">
+          <span className="text-xs font-bold uppercase tracking-widest text-accent">
             Daftar Putar Pribadi
           </span>
 
@@ -93,20 +93,20 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full text-xl sm:text-2xl font-bold bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-[#fa243c]"
+                className="w-full text-xl sm:text-2xl font-bold bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-accent"
                 placeholder="Judul Playlist"
               />
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
-                className="w-full text-xs bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-[#fa243c] resize-none"
+                className="w-full text-xs bg-white/10 border border-white/20 rounded-xl px-3 py-1.5 text-white focus:outline-none focus:border-accent resize-none"
                 placeholder="Deskripsi..."
               />
               <div className="flex gap-2 justify-center md:justify-start">
                 <button
                   onClick={handleSaveEdit}
-                  className="px-3 py-1 bg-[#fa243c] text-white rounded-lg text-xs font-semibold flex items-center gap-1"
+                  className="px-3 py-1 bg-accent text-white rounded-lg text-xs font-semibold flex items-center gap-1"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Simpan
@@ -142,7 +142,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
             <button
               onClick={() => onPlayAll(playlist.songs, false)}
               disabled={playlist.songs.length === 0}
-              className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#fa243c] hover:bg-[#e01e35] disabled:opacity-40 text-white font-bold text-xs sm:text-sm shadow-lg shadow-red-600/30 flex items-center gap-2 active:scale-95 transition"
+              className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-accent hover:bg-accent-light disabled:opacity-40 text-white font-bold text-xs sm:text-sm shadow-lg shadow-accent flex items-center gap-2 active:scale-95 transition"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>Putar Semua</span>
@@ -191,7 +191,7 @@ export const PlaylistDetailView: React.FC<PlaylistDetailViewProps> = ({
             </p>
             <button
               onClick={onNavigateToBrowse}
-              className="mt-2 px-4 py-2 rounded-xl bg-[#fa243c] text-white text-xs font-semibold hover:bg-[#e01e35] transition inline-flex items-center gap-1.5"
+              className="mt-2 px-4 py-2 rounded-xl bg-accent text-white text-xs font-semibold hover:bg-accent-light transition inline-flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
               Telusuri Musik Trending

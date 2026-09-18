@@ -24,7 +24,21 @@ export interface Playlist {
   isDefault?: boolean;
 }
 
-export type ViewTab = 'listen-now' | 'browse' | 'search' | 'favorites' | 'history' | 'playlist-detail';
+export type ViewTab =
+  | 'home'
+  | 'listen-now'
+  | 'explore'
+  | 'browse'
+  | 'videos'
+  | 'radio'
+  | 'playlists'
+  | 'albums'
+  | 'tracks'
+  | 'favorites'
+  | 'artists'
+  | 'search'
+  | 'history'
+  | 'playlist-detail';
 
 export type RepeatMode = 'off' | 'all' | 'one';
 
@@ -41,3 +55,24 @@ export interface PlayerState {
   queueIndex: number;
   playbackRate: number;
 }
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  picture?: string;
+  givenName?: string;
+  familyName?: string;
+  loggedInAt: number;
+}
+
+export interface ThemeColors {
+  hex: string;
+  rgb: string;
+  lightHex: string;
+  darkHex: string;
+  glow: string;
+  surfaceGlow: string;
+  bgGradient: string;
+}
+

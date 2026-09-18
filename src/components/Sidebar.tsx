@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import {
-  Home,
-  Search,
-  Compass,
-  Heart,
-  Clock,
-  Plus,
+  Radio,
   ListMusic,
-  Database,
-  Download,
-  Upload,
+  Disc3,
+  Music,
+  Film,
+  Mic2,
+  Plus,
+  MoreHorizontal,
   X,
-  Library,
+  Upload,
+  Download,
+  Trash2,
+  Sparkles,
 } from 'lucide-react';
-import { Playlist, ViewTab } from '../types';
+import { Playlist, UserProfile, ViewTab } from '../types';
 import { db } from '../services/db';
 
 interface SidebarProps {
@@ -26,6 +27,8 @@ interface SidebarProps {
   onPlaylistDataChanged: () => void;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
+  user?: UserProfile | null;
+  onOpenAuthModal?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -38,8 +41,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onPlaylistDataChanged,
   isMobileOpen = false,
   onCloseMobile,
+  user = null,
+  onOpenAuthModal,
 }) => {
-  const [showBackupMenu, setShowBackupMenu] = useState(false);
+  const [showMenuDropdown, setShowMenuDropdown] = useState(false);
 
   const handleTabClick = (tab: ViewTab) => {
     onSelectTab(tab);
@@ -60,6 +65,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     a.download = `vanz-music-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    setShowMenuDropdown(false);
   };
 
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,224 +83,60 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }
     };
     reader.readAsText(file);
+    setShowMenuDropdown(false);
   };
 
+  const isHomeActive = (currentTab === 'home' || currentTab === 'listen-now') && !selectedPlaylistId;
+  const isExploreActive = (currentTab === 'explore' || currentTab === 'browse') && !selectedPlaylistId;
+  const isVideosActive = currentTab === 'videos' && !selectedPlaylistId;
+  const isRadioActive = currentTab === 'radio' && !selectedPlaylistId;
+  const isPlaylistsActive = currentTab === 'playlists' && !selectedPlaylistId;
+  const isAlbumsActive = currentTab === 'albums' && !selectedPlaylistId;
+  const isTracksActive = (currentTab === 'tracks' || currentTab === 'favorites') && !selectedPlaylistId;
+  const isArtistsActive = currentTab === 'artists' && !selectedPlaylistId;
+
   const renderContent = (isMobileDrawer = false) => (
-    <div className="flex flex-col h-full gap-2 select-none">
-      {/* Top Card: Spotify Brand & Primary Navigation (Beranda, Cari) */}
-      <div className={`p-3 sm:p-4 ${isMobileDrawer ? 'bg-transparent' : 'bg-[#121212] rounded-lg'} shrink-0`}>
-        {/* Brand Header */}
-        <div className="flex items-center justify-between px-2 mb-4">
-          <div className="flex items-center gap-2.5">
-            {/* Spotify-styled Vanz Music Logo */}
-            <div className="w-8 h-8 rounded-full bg-[#1ed760] flex items-center justify-center shadow-lg shadow-[#1ed760]/30 shrink-0">
-              <svg viewBox="0 0 24 24" className="w-5 h-5 fill-black">
-                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 01-.858.207c-2.35-1.436-5.308-1.76-8.793-.963a.625.625 0 01-.28-1.218c3.811-.871 7.086-.499 9.724 1.116a.625.625 0 01.207.858zm1.225-2.724a.782.782 0 01-1.076.257c-2.69-1.654-6.79-2.133-9.97-1.168a.78.78 0 11-.456-1.494c3.635-1.103 8.163-.569 11.245 1.328a.78.78 0 01.257 1.077zm.105-2.835C14.693 8.93 9.387 8.75 6.302 9.687a.936.936 0 11-.544-1.792c3.541-1.076 9.39-.868 13.15 1.362a.938.938 0 01-1.022 1.608z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
-                Vanz Music
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-[#1ed760]/20 text-[#1ed760] font-bold">
-                  Premium
-                </span>
-              </h1>
-            </div>
+    <div className="flex flex-col h-full bg-[#000000] text-white select-none overflow-hidden px-4 py-4">
+      {/* Top Header: Circular Logo + Three Dots Menu */}
+      <div className="flex items-center justify-between pb-6 pt-1">
+        <div
+          onClick={() => handleTabClick('home')}
+          className="flex items-center gap-2.5 cursor-pointer group"
+        >
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500/20 via-white/5 to-cyan-400/30 p-1 flex items-center justify-center border border-cyan-400/30 shadow-[0_0_12px_rgba(0,229,255,0.25)] group-hover:scale-105 transition">
+            <img
+              src="./vanz-logo.png"
+              alt="Vanz Music"
+              className="w-full h-full object-contain"
+            />
           </div>
-
-          {isMobileDrawer && (
-            <button
-              onClick={onCloseMobile}
-              className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition"
-              aria-label="Tutup Menu"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          )}
+          <span className="font-extrabold tracking-tight text-white text-sm hidden sm:inline-block">
+            Vanz<span className="text-cyan-400 font-bold ml-0.5">Tidal</span>
+          </span>
         </div>
 
-        {/* Primary Navigation */}
-        <nav className="space-y-1">
+        <div className="relative">
           <button
-            id={isMobileDrawer ? 'mobile-drawer-listen-now-btn' : 'nav-listen-now-btn'}
-            onClick={() => handleTabClick('listen-now')}
-            className={`w-full flex items-center gap-4 px-3 py-2.5 rounded-md text-sm font-bold transition ${
-              currentTab === 'listen-now' && !selectedPlaylistId
-                ? 'text-white bg-[#282828]'
-                : 'text-[#b3b3b3] hover:text-white hover:bg-white/5'
-            }`}
+            onClick={() => setShowMenuDropdown(!showMenuDropdown)}
+            className="p-1.5 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition active:scale-95"
+            title="Menu Tambahan"
           >
-            <Home className="w-5 h-5" />
-            <span>Beranda</span>
+            <MoreHorizontal className="w-4 h-4" />
           </button>
 
-          <button
-            id={isMobileDrawer ? 'mobile-drawer-search-btn' : 'nav-search-btn'}
-            onClick={() => handleTabClick('search')}
-            className={`w-full flex items-center gap-4 px-3 py-2.5 rounded-md text-sm font-bold transition ${
-              currentTab === 'search' && !selectedPlaylistId
-                ? 'text-white bg-[#282828]'
-                : 'text-[#b3b3b3] hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <Search className="w-5 h-5" />
-            <span>Cari</span>
-          </button>
-        </nav>
-      </div>
-
-      {/* Bottom Card: Koleksi Kamu (Your Library) */}
-      <div
-        className={`flex-1 flex flex-col min-h-0 p-3 sm:p-4 ${
-          isMobileDrawer ? 'bg-transparent' : 'bg-[#121212] rounded-lg'
-        }`}
-      >
-        {/* Library Header */}
-        <div className="flex items-center justify-between px-2 pb-3 shrink-0">
-          <div className="flex items-center gap-3 text-[#b3b3b3] hover:text-white transition cursor-pointer">
-            <Library className="w-5 h-5" />
-            <span className="text-sm font-bold">Koleksi Kamu</span>
-          </div>
-
-          <button
-            id={isMobileDrawer ? 'mobile-drawer-create-playlist-btn' : 'create-playlist-sidebar-btn'}
-            onClick={() => {
-              onOpenCreatePlaylist();
-              if (isMobileDrawer) onCloseMobile?.();
-            }}
-            className="p-1.5 rounded-full hover:bg-white/10 text-[#b3b3b3] hover:text-white transition"
-            title="Buat Playlist Baru"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Library Scrollable List */}
-        <div className="flex-1 overflow-y-auto space-y-1 pr-1">
-          {/* Liked Songs (Spotify signature purple gradient square with white heart) */}
-          <button
-            id={isMobileDrawer ? 'mobile-drawer-favorites-btn' : 'nav-favorites-btn'}
-            onClick={() => handleTabClick('favorites')}
-            className={`w-full flex items-center gap-3 p-2 rounded-md transition text-left group ${
-              currentTab === 'favorites' && !selectedPlaylistId
-                ? 'bg-[#282828] text-white font-semibold'
-                : 'text-[#b3b3b3] hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <div className="w-10 h-10 rounded bg-gradient-to-br from-[#450af5] to-[#8e8ee5] flex items-center justify-center shrink-0 shadow-sm">
-              <Heart className="w-5 h-5 text-white fill-white" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold truncate text-white">Lagu yang Disukai</p>
-              <p className="text-xs text-[#b3b3b3]">Playlist • Disukai</p>
-            </div>
-          </button>
-
-          {/* Browse / Trending Charts */}
-          <button
-            id={isMobileDrawer ? 'mobile-drawer-browse-btn' : 'nav-browse-btn'}
-            onClick={() => handleTabClick('browse')}
-            className={`w-full flex items-center gap-3 p-2 rounded-md transition text-left group ${
-              currentTab === 'browse' && !selectedPlaylistId
-                ? 'bg-[#282828] text-white font-semibold'
-                : 'text-[#b3b3b3] hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <div className="w-10 h-10 rounded bg-[#282828] flex items-center justify-center shrink-0 border border-white/5">
-              <Compass className="w-5 h-5 text-[#1ed760]" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold truncate text-white">Tangga Lagu Trending</p>
-              <p className="text-xs text-[#b3b3b3]">Katalog • Global</p>
-            </div>
-          </button>
-
-          {/* History */}
-          <button
-            id={isMobileDrawer ? 'mobile-drawer-history-btn' : 'nav-history-btn'}
-            onClick={() => handleTabClick('history')}
-            className={`w-full flex items-center gap-3 p-2 rounded-md transition text-left group ${
-              currentTab === 'history' && !selectedPlaylistId
-                ? 'bg-[#282828] text-white font-semibold'
-                : 'text-[#b3b3b3] hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <div className="w-10 h-10 rounded bg-[#282828] flex items-center justify-center shrink-0 border border-white/5">
-              <Clock className="w-5 h-5 text-amber-400" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold truncate text-white">Riwayat Putar</p>
-              <p className="text-xs text-[#b3b3b3]">Aktivitas Terakhir</p>
-            </div>
-          </button>
-
-          {/* Custom Playlists Divider */}
-          {playlists.length > 0 && (
-            <div className="pt-2 pb-1 px-2 text-[11px] font-bold uppercase tracking-wider text-[#b3b3b3]/60">
-              Daftar Putar Kamu
-            </div>
-          )}
-
-          {/* Custom User Playlists */}
-          {playlists.map((playlist) => {
-            const isSelected = selectedPlaylistId === playlist.id;
-            return (
-              <button
-                key={playlist.id}
-                onClick={() => handlePlaylistClick(playlist.id)}
-                className={`w-full flex items-center gap-3 p-2 rounded-md transition text-left group ${
-                  isSelected
-                    ? 'bg-[#282828] text-[#1ed760] font-semibold'
-                    : 'text-[#b3b3b3] hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <div
-                  className={`w-10 h-10 rounded bg-gradient-to-br ${playlist.coverGradient} flex items-center justify-center shrink-0 shadow-sm`}
-                >
-                  <ListMusic className="w-5 h-5 text-white" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-sm font-semibold truncate ${isSelected ? 'text-[#1ed760]' : 'text-white'}`}>
-                    {playlist.title}
-                  </p>
-                  <p className="text-xs text-[#b3b3b3]">
-                    Playlist • {playlist.songs.length} lagu
-                  </p>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Sidebar Footer: Local Database Sync Indicator & Backup */}
-        <div className="pt-3 mt-2 border-t border-white/5 shrink-0">
-          <div className="flex items-center justify-between px-2 py-1 text-xs">
-            <div className="flex items-center gap-2 text-[#b3b3b3]">
-              <span className="w-2 h-2 rounded-full bg-[#1ed760] animate-pulse"></span>
-              <span className="text-[11px]">Database Lokal Aktif</span>
-            </div>
-            <button
-              id={isMobileDrawer ? 'mobile-toggle-backup-btn' : 'toggle-backup-menu-btn'}
-              onClick={() => setShowBackupMenu(!showBackupMenu)}
-              className="p-1.5 rounded-lg hover:bg-white/10 text-[#b3b3b3] hover:text-white transition"
-              title="Cadangkan / Pulihkan Data"
-            >
-              <Database className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {showBackupMenu && (
-            <div className="mt-2 p-2 rounded-lg bg-[#282828] border border-white/10 space-y-1.5 animate-fadeIn">
+          {/* Three dots dropdown */}
+          {showMenuDropdown && (
+            <div className="absolute left-0 top-8 w-48 bg-[#18181f] border border-white/10 rounded-xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
               <button
                 onClick={handleExport}
-                className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/10 text-xs text-white transition"
+                className="w-full px-3.5 py-2 flex items-center gap-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 text-left transition"
               >
-                <Download className="w-3.5 h-3.5 text-[#1ed760]" />
-                <span>Ekspor Backup JSON</span>
+                <Download className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Cadangkan Playlist</span>
               </button>
-              <label className="w-full flex items-center gap-2 px-2 py-1.5 rounded hover:bg-white/10 text-xs text-white transition cursor-pointer">
-                <Upload className="w-3.5 h-3.5 text-[#1ed760]" />
-                <span>Impor Backup JSON</span>
+              <label className="w-full px-3.5 py-2 flex items-center gap-2.5 text-xs text-white/80 hover:text-white hover:bg-white/10 cursor-pointer transition">
+                <Upload className="w-3.5 h-3.5 text-amber-400" />
+                <span>Pulihkan Playlist</span>
                 <input
                   type="file"
                   accept=".json"
@@ -302,7 +144,202 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   className="hidden"
                 />
               </label>
+              <button
+                onClick={() => {
+                  if (confirm('Bersihkan riwayat dan putar dari awal?')) {
+                    db.clearHistory();
+                    onPlaylistDataChanged();
+                  }
+                  setShowMenuDropdown(false);
+                }}
+                className="w-full px-3.5 py-2 flex items-center gap-2.5 text-xs text-rose-400 hover:text-rose-300 hover:bg-white/10 text-left transition"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Bersihkan Riwayat</span>
+              </button>
             </div>
+          )}
+
+          {isMobileDrawer && (
+            <button
+              onClick={onCloseMobile}
+              className="p-1.5 rounded-full hover:bg-white/10 text-white/60 hover:text-white transition ml-1"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Main Navigation: Home, Explore, Videos */}
+      <nav className="space-y-1 pb-6 border-b border-white/5">
+        <button
+          onClick={() => handleTabClick('home')}
+          className={`w-full text-left py-2 px-2.5 rounded-lg text-[15px] font-bold transition flex items-center justify-between ${
+            isHomeActive
+              ? 'text-cyan-400'
+              : 'text-white/70 hover:text-white'
+          }`}
+        >
+          <span>Home</span>
+          {isHomeActive && <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00e5ff]" />}
+        </button>
+
+        <button
+          onClick={() => handleTabClick('explore')}
+          className={`w-full text-left py-2 px-2.5 rounded-lg text-[15px] font-bold transition flex items-center justify-between ${
+            isExploreActive
+              ? 'text-cyan-400'
+              : 'text-white/70 hover:text-white'
+          }`}
+        >
+          <span>Explore</span>
+          {isExploreActive && <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00e5ff]" />}
+        </button>
+
+        <button
+          onClick={() => handleTabClick('videos')}
+          className={`w-full text-left py-2 px-2.5 rounded-lg text-[15px] font-bold transition flex items-center justify-between ${
+            isVideosActive
+              ? 'text-cyan-400'
+              : 'text-white/70 hover:text-white'
+          }`}
+        >
+          <span>Videos</span>
+          {isVideosActive && <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00e5ff]" />}
+        </button>
+      </nav>
+
+      {/* MY COLLECTION Section */}
+      <div className="pt-5 pb-4">
+        <div className="px-2.5 pb-2 text-[11px] font-extrabold uppercase tracking-wider text-white/40">
+          My Collection
+        </div>
+        <div className="space-y-0.5">
+          <button
+            onClick={() => handleTabClick('radio')}
+            className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+              isRadioActive
+                ? 'text-cyan-400 bg-white/5'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Radio className="w-4 h-4 text-white/50 shrink-0" />
+            <span>Mixes & Radio</span>
+          </button>
+
+          <button
+            onClick={() => handleTabClick('playlists')}
+            className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+              isPlaylistsActive
+                ? 'text-cyan-400 bg-white/5'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <ListMusic className="w-4 h-4 text-white/50 shrink-0" />
+            <span>Playlists</span>
+          </button>
+
+          <button
+            onClick={() => handleTabClick('albums')}
+            className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+              isAlbumsActive
+                ? 'text-cyan-400 bg-white/5'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Disc3 className="w-4 h-4 text-white/50 shrink-0" />
+            <span>Albums</span>
+          </button>
+
+          <button
+            onClick={() => handleTabClick('tracks')}
+            className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+              isTracksActive
+                ? 'text-cyan-400 bg-white/5'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Music className="w-4 h-4 text-white/50 shrink-0" />
+            <span>Tracks</span>
+          </button>
+
+          <button
+            onClick={() => handleTabClick('videos')}
+            className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+              isVideosActive
+                ? 'text-cyan-400 bg-white/5'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Film className="w-4 h-4 text-white/50 shrink-0" />
+            <span>Videos</span>
+          </button>
+
+          <button
+            onClick={() => handleTabClick('artists')}
+            className={`w-full flex items-center gap-3 px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+              isArtistsActive
+                ? 'text-cyan-400 bg-white/5'
+                : 'text-white/70 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <Mic2 className="w-4 h-4 text-white/50 shrink-0" />
+            <span>Artists</span>
+          </button>
+        </div>
+      </div>
+
+      {/* PLAYLISTS Section */}
+      <div className="flex-1 min-h-0 flex flex-col pt-3 border-t border-white/5">
+        <div className="flex items-center justify-between px-2.5 pb-2 shrink-0">
+          <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/40">
+            Playlists
+          </span>
+          <button
+            onClick={() => onOpenCreatePlaylist()}
+            className="p-1 rounded hover:bg-white/10 text-white/40 hover:text-white transition"
+            title="Tambah Playlist"
+          >
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* + Create... Action */}
+        <button
+          onClick={() => {
+            onOpenCreatePlaylist();
+            if (isMobileDrawer && onCloseMobile) onCloseMobile();
+          }}
+          className="w-full flex items-center gap-2 px-2.5 py-2 text-xs font-semibold text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition shrink-0"
+        >
+          <Plus className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Create...</span>
+        </button>
+
+        {/* Scrollable List of Playlists */}
+        <div className="flex-1 overflow-y-auto space-y-0.5 pr-1 no-scrollbar pt-1">
+          {playlists.map((pl) => {
+            const isSelected = selectedPlaylistId === pl.id;
+            return (
+              <button
+                key={pl.id}
+                onClick={() => handlePlaylistClick(pl.id)}
+                className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs truncate transition block ${
+                  isSelected
+                    ? 'text-cyan-400 font-bold bg-white/5'
+                    : 'text-white/60 hover:text-white hover:bg-white/5 font-medium'
+                }`}
+              >
+                {pl.title}
+              </button>
+            );
+          })}
+
+          {playlists.length === 0 && (
+            <p className="px-2.5 py-3 text-[11px] text-white/30 italic">
+              Belum ada playlist tersimpan
+            </p>
           )}
         </div>
       </div>
@@ -311,32 +348,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* 1. Desktop Spotify-styled Sidebar */}
+      {/* Desktop Fixed Left Sidebar */}
       <aside
-        id="spotify-sidebar-desktop"
-        className="hidden md:flex flex-col w-64 lg:w-72 h-full select-none shrink-0 z-20"
+        id="vanz-tidal-sidebar"
+        className="hidden md:flex flex-col w-56 lg:w-60 h-full shrink-0 border-r border-white/5 bg-[#000000] z-20"
       >
         {renderContent(false)}
       </aside>
 
-      {/* 2. Mobile Slide-over Drawer (< md) */}
+      {/* Mobile Slide-over Drawer (< md screens) */}
       {isMobileOpen && (
-        <div
-          id="spotify-sidebar-mobile-drawer"
-          className="fixed inset-0 z-50 md:hidden flex"
-          role="dialog"
-          aria-modal="true"
-        >
-          {/* Backdrop blur click to close */}
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={onCloseMobile}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
           />
 
-          {/* Slide-over panel */}
-          <aside className="w-72 max-w-[85vw] h-full bg-[#121212] border-r border-white/10 flex flex-col justify-between shadow-2xl relative z-10 select-none animate-in slide-in-from-left duration-200 p-2">
+          {/* Drawer panel */}
+          <div className="relative w-64 max-w-[80vw] h-full bg-[#000000] shadow-2xl z-10 flex flex-col border-r border-white/10 animate-in slide-in-from-left duration-200">
             {renderContent(true)}
-          </aside>
+          </div>
         </div>
       )}
     </>

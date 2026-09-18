@@ -1,6 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Song, PlayerState } from '../types';
 
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: any;
+  }
+}
+
 interface YouTubeEngineProps {
   currentSong: Song | null;
   isPlaying: boolean;

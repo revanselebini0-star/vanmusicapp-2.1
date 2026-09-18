@@ -294,3 +294,5 @@ export async function searchYouTubeMusic(query: string, useCache: boolean = true
     return matching.length > 0 ? matching : FALLBACK_TRENDING.slice(0, 4);
   }
 }
+
+export const searchYouTube = searchYouTubeMusic;

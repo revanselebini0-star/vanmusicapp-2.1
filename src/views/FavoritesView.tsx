@@ -33,7 +33,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
         </div>
 
         <div className="flex-1 text-center md:text-left min-w-0 w-full">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#fa243c]">
+          <span className="text-xs font-bold uppercase tracking-widest text-accent">
             Perpustakaan Pribadi
           </span>
           <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-white tracking-tight mt-1 mb-2">
@@ -51,7 +51,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
             <button
               onClick={() => onPlayAll(favorites, false)}
               disabled={favorites.length === 0}
-              className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-[#fa243c] hover:bg-[#e01e35] disabled:opacity-40 text-white font-bold text-xs sm:text-sm shadow-lg shadow-red-600/30 flex items-center gap-2 active:scale-95 transition"
+              className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-accent hover:bg-accent-light disabled:opacity-40 text-white font-bold text-xs sm:text-sm shadow-lg shadow-accent flex items-center gap-2 active:scale-95 transition"
             >
               <Play className="w-4 h-4 fill-current" />
               <span>Putar Semua</span>
@@ -80,7 +80,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
             </p>
             <button
               onClick={onNavigateToBrowse}
-              className="mt-2 px-4 py-2 rounded-xl bg-[#fa243c] text-white text-xs font-semibold hover:bg-[#e01e35] transition inline-flex items-center gap-1.5"
+              className="mt-2 px-4 py-2 rounded-xl bg-accent text-white text-xs font-semibold hover:bg-accent-light transition inline-flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" />
               Telusuri Musik Trending

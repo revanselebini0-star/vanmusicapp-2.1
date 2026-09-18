@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Compass, Search, Heart, ListMusic } from 'lucide-react';
+import { Home, LayoutGrid, Radio, Library, Search } from 'lucide-react';
 import { ViewTab } from '../types';
 
 interface MobileBottomNavProps {
@@ -12,86 +12,93 @@ interface MobileBottomNavProps {
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   currentTab,
   onSelectTab,
-  onOpenLibraryMenu,
-  favoriteCount,
 }) => {
+  const isBeranda = currentTab === 'home' || currentTab === 'listen-now';
+  const isBaru = currentTab === 'explore' || currentTab === 'browse';
+  const isRadio = currentTab === 'radio';
+  const isPerpustakaan =
+    currentTab === 'playlists' ||
+    currentTab === 'albums' ||
+    currentTab === 'tracks' ||
+    currentTab === 'favorites' ||
+    currentTab === 'artists' ||
+    currentTab === 'history';
+  const isCari = currentTab === 'search';
+
   return (
     <nav
-      id="mobile-bottom-navigation"
-      aria-label="Navigasi Bawah Melayang Layar Hp"
-      className="md:hidden fixed bottom-3.5 inset-x-3 sm:inset-x-8 max-w-md mx-auto h-16 bg-[#16161f]/85 backdrop-blur-2xl border border-white/15 rounded-full shadow-[0_12px_40px_rgba(0,0,0,0.7)] z-40 px-2 sm:px-3 flex items-center justify-around select-none ring-1 ring-black/30"
+      id="apple-music-bottom-dock"
+      aria-label="Navigasi Bawah Layar HP Apple Music"
+      className="md:hidden fixed bottom-2.5 inset-x-3 sm:inset-x-6 max-w-md mx-auto h-[62px] bg-[#1c1c1e]/85 backdrop-blur-3xl border border-white/10 rounded-full shadow-[0_16px_40px_rgba(0,0,0,0.8)] z-40 px-2 flex items-center justify-between select-none"
     >
-      {/* 1. Dengarkan Sekarang */}
+      {/* 1. Beranda */}
       <button
-        id="mobile-tab-listen-now"
-        onClick={() => onSelectTab('listen-now')}
-        className={`flex flex-col items-center justify-center min-w-[52px] min-h-[44px] py-1 px-2.5 rounded-full transition active:scale-95 ${
-          currentTab === 'listen-now'
-            ? 'text-[#fa243c] bg-white/10'
-            : 'text-white/55 hover:text-white hover:bg-white/5'
+        id="mobile-tab-beranda"
+        onClick={() => onSelectTab('home')}
+        className={`flex flex-col items-center justify-center min-w-[56px] py-1.5 px-2 rounded-full transition active:scale-95 ${
+          isBeranda
+            ? 'text-[#fa2d48] bg-white/10'
+            : 'text-neutral-400 hover:text-white'
         }`}
       >
-        <Flame className="w-5 h-5" />
-        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Dengarkan</span>
+        <Home className="w-5 h-5 stroke-[2.2]" />
+        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Beranda</span>
       </button>
 
-      {/* 2. Telusuri Trending */}
+      {/* 2. Baru (Active tab in screenshot with 4-square icon) */}
       <button
-        id="mobile-tab-browse"
-        onClick={() => onSelectTab('browse')}
-        className={`flex flex-col items-center justify-center min-w-[52px] min-h-[44px] py-1 px-2.5 rounded-full transition active:scale-95 ${
-          currentTab === 'browse'
-            ? 'text-[#fa243c] bg-white/10'
-            : 'text-white/55 hover:text-white hover:bg-white/5'
+        id="mobile-tab-baru"
+        onClick={() => onSelectTab('explore')}
+        className={`flex flex-col items-center justify-center min-w-[56px] py-1.5 px-2 rounded-full transition active:scale-95 ${
+          isBaru
+            ? 'text-[#fa2d48] bg-white/10'
+            : 'text-neutral-400 hover:text-white'
         }`}
       >
-        <Compass className="w-5 h-5" />
-        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Telusuri</span>
+        <LayoutGrid className="w-5 h-5 stroke-[2.2]" />
+        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Baru</span>
       </button>
 
-      {/* 3. Pencarian Lagu */}
+      {/* 3. Radio */}
       <button
-        id="mobile-tab-search"
-        onClick={() => onSelectTab('search')}
-        className={`flex flex-col items-center justify-center min-w-[52px] min-h-[44px] py-1 px-2.5 rounded-full transition active:scale-95 ${
-          currentTab === 'search'
-            ? 'text-[#fa243c] bg-white/10'
-            : 'text-white/55 hover:text-white hover:bg-white/5'
+        id="mobile-tab-radio"
+        onClick={() => onSelectTab('radio')}
+        className={`flex flex-col items-center justify-center min-w-[56px] py-1.5 px-2 rounded-full transition active:scale-95 ${
+          isRadio
+            ? 'text-[#fa2d48] bg-white/10'
+            : 'text-neutral-400 hover:text-white'
         }`}
       >
-        <Search className="w-5 h-5" />
-        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Cari</span>
+        <Radio className="w-5 h-5 stroke-[2.2]" />
+        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Radio</span>
       </button>
 
-      {/* 4. Favorit */}
+      {/* 4. Perpustakaan */}
       <button
-        id="mobile-tab-favorites"
+        id="mobile-tab-perpustakaan"
         onClick={() => onSelectTab('favorites')}
-        className={`flex flex-col items-center justify-center min-w-[52px] min-h-[44px] py-1 px-2.5 rounded-full relative transition active:scale-95 ${
-          currentTab === 'favorites'
-            ? 'text-[#fa243c] bg-white/10'
-            : 'text-white/55 hover:text-white hover:bg-white/5'
+        className={`flex flex-col items-center justify-center min-w-[56px] py-1.5 px-2 rounded-full transition active:scale-95 ${
+          isPerpustakaan
+            ? 'text-[#fa2d48] bg-white/10'
+            : 'text-neutral-400 hover:text-white'
         }`}
       >
-        <div className="relative">
-          <Heart className="w-5 h-5" fill={currentTab === 'favorites' ? '#fa243c' : 'none'} />
-          {favoriteCount > 0 && (
-            <span className="absolute -top-1 -right-2 px-1 text-[9px] font-bold rounded-full bg-[#fa243c] text-white">
-              {favoriteCount > 99 ? '99+' : favoriteCount}
-            </span>
-          )}
-        </div>
-        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Favorit</span>
+        <Library className="w-5 h-5 stroke-[2.2]" />
+        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Perpustakaan</span>
       </button>
 
-      {/* 5. Koleksi & Playlist Drawer */}
+      {/* 5. Cari (Distinctive circular pill on right like screenshot) */}
       <button
-        id="mobile-tab-library"
-        onClick={onOpenLibraryMenu}
-        className="flex flex-col items-center justify-center min-w-[52px] min-h-[44px] py-1 px-2.5 rounded-full text-white/55 hover:text-white hover:bg-white/5 active:scale-95 transition"
+        id="mobile-tab-cari"
+        onClick={() => onSelectTab('search')}
+        className={`flex items-center justify-center w-11 h-11 rounded-full transition active:scale-95 ${
+          isCari
+            ? 'bg-[#fa2d48] text-white shadow-md'
+            : 'bg-white/10 text-neutral-300 hover:text-white hover:bg-white/15'
+        }`}
+        aria-label="Cari Musik"
       >
-        <ListMusic className="w-5 h-5" />
-        <span className="text-[10px] font-semibold mt-0.5 tracking-tight">Koleksi</span>
+        <Search className="w-5 h-5 stroke-[2.2]" />
       </button>
     </nav>
   );
